@@ -1,0 +1,423 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Анализ заголовков для Дзена</title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    
+<style>
+    :root {
+        --primary: #6366f1;
+        --primary-dark: #4f46e5;
+        --bg-light: #f9fafb;
+        --bg-dark: #1f2937;
+        --text-light: #111827;
+        --text-dark: #f3f4f6;
+        --radius: 12px;
+        --shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        --transition: all 0.3s ease;
+    }
+    * {
+        box-sizing: border-box;
+    }
+    body {
+        font-family: 'Inter', sans-serif;
+        background: var(--bg-light);
+        color: var(--text-light);
+        padding: 40px 16px;
+        margin: 0;
+        transition: var(--transition);
+    }
+    body.dark {
+        background: var(--bg-dark);
+        color: var(--text-dark);
+    }
+    h1 {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 32px;
+        font-weight: 600;
+    }
+    .form-container {
+        background: #ffffff;
+        border-radius: var(--radius);
+        padding: 24px 28px;
+        max-width: 720px;
+        margin: 0 auto 32px auto;
+        box-shadow: var(--shadow);
+        transition: var(--transition);
+    }
+    body.dark .form-container {
+        background: #374151;
+    }
+    .form-container h2 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        color: var(--primary);
+    }
+    .form-container input,
+    .form-container textarea {
+        width: 100%;
+        padding: 12px 14px;
+        margin-bottom: 14px;
+        border: 1px solid #d1d5db;
+        border-radius: var(--radius);
+        font-size: 15px;
+        transition: var(--transition);
+    }
+    .form-container input:focus,
+    .form-container textarea:focus {
+        border-color: var(--primary);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+    body.dark .form-container input,
+    body.dark .form-container textarea {
+        background: #4b5563;
+        color: var(--text-dark);
+        border-color: #6b7280;
+    }
+    .form-container button {
+        background: var(--primary);
+        color: white;
+        padding: 12px 20px;
+        border: none;
+        border-radius: var(--radius);
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 15px;
+        transition: var(--transition);
+    }
+    .form-container button:hover {
+        background: var(--primary-dark);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(99, 102, 241, 0.3);
+    }
+    .controls {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin: 20px auto 28px;
+        max-width: 900px;
+    }
+    .controls select,
+    .controls button {
+        padding: 10px 14px;
+        font-size: 14px;
+        border-radius: var(--radius);
+        border: 1px solid #d1d5db;
+        background: white;
+        transition: var(--transition);
+        cursor: pointer;
+    }
+    .theme-toggle {
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 10px 16px;
+        border-radius: var(--radius);
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+    .theme-toggle:hover {
+        background: var(--primary-dark);
+    }
+    table.dataTable {
+        width: 100% !important;
+        background: white;
+        border-radius: var(--radius);
+        overflow: hidden;
+        font-size: 15px;
+        box-shadow: var(--shadow);
+    }
+    body.dark table.dataTable {
+        background: #374151;
+        color: var(--text-dark);
+    }
+    table.dataTable th {
+        background: #f3f4f6;
+        font-weight: 600;
+        padding: 12px 16px;
+    }
+    table.dataTable td {
+        padding: 10px 14px;
+    }
+    .copy-btn {
+        margin-left: 6px;
+        cursor: pointer;
+        color: var(--primary-dark);
+        font-size: 14px;
+    }
+
+    body.dark input[type="search"],
+    body.dark select {
+        background-color: #4b5563;
+        color: #f3f4f6;
+        border: 1px solid #6b7280;
+        border-radius: 8px;
+        padding: 6px 10px;
+    }
+    body.dark .dataTables_wrapper .dataTables_info,
+    body.dark .dataTables_wrapper .dataTables_paginate,
+    body.dark .dataTables_wrapper .dataTables_length label,
+    body.dark .dataTables_wrapper .dataTables_filter label {
+        color: #f3f4f6;
+    }
+    body.dark .dataTables_wrapper .dataTables_paginate .paginate_button {
+        color: #e5e7eb !important;
+        border-radius: 6px;
+    }
+    body.dark .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        background-color: #6366f1 !important;
+        border: none !important;
+    }
+    body.dark table.dataTable tbody td {
+        background-color: #374151 !important;
+    }
+
+</style>
+
+</head>
+<body>
+    <button class="theme-toggle" onclick="document.body.classList.toggle('dark')">🌓 Тема</button>
+    <h1>Анализ заголовков для Дзена</h1>
+    <div class="form-container">
+        <h2>➕ Добавить новый заголовок</h2>
+        <input id="title" placeholder="Заголовок">
+        <input id="type" placeholder="Тип (например: Цитата, конфликт)">
+        <input id="emotion" placeholder="Эмоция (например: Гнев, обида)">
+        <input id="theme" placeholder="Тема (например: Семья)">
+        <input id="ctr" placeholder="CTR (например: 12%)">
+        <input id="reach" placeholder="Охват (например: 20 000)">
+        <textarea id="comment" placeholder="Комментарий"></textarea>
+        <button onclick="addRow()">Добавить</button>
+    </div>
+
+    <div class="controls">
+        <select id="filterTheme"><option value="">Все темы</option></select>
+        <select id="filterEmotion"><option value="">Все эмоции</option></select>
+        <button onclick="downloadCSV()">⬇️ Скачать CSV</button>
+    </div>
+
+    <table id="headlineTable" class="display">
+        <thead>
+            <tr>
+                <th>Заголовок</th>
+                <th>Тип</th>
+                <th>Эмоция</th>
+                <th>Тема</th>
+                <th>CTR</th>
+                <th>Охват</th>
+                <th>Комментарий</th><th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>«Ты ей квартиру, а она тебе рога!»<span class="copy-btn" onclick="copyText('Ты ей квартиру, а она тебе рога!')">📋</span></td>
+                <td>Цитата, конфликт</td>
+                <td>Гнев, обида</td>
+                <td>Семья</td>
+                <td>14%</td>
+                <td>25 000</td>
+                <td>Сильный эмоциональный крючок</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js">
+function rebuildTableFromStorage() {
+    table.clear();
+    const saved = JSON.parse(localStorage.getItem('rows') || '[]');
+    saved.forEach((row, index) => {
+        table.row.add([
+            row[0] + '<span class="copy-btn" onclick="copyText(\'' + row[0].replace(/'/g, "\\'") + '\')">📋</span>',
+            row[1], row[2], row[3], row[4], row[5], row[6],
+            `<span onclick="editRow(${index})" style='cursor:pointer; color:#4f46e5;'>✏️</span>
+             <span onclick="deleteRow(${index})" style='cursor:pointer; margin-left:10px; color:#ef4444;'>🗑️</span>`
+        ]).draw();
+    });
+    updateFilters();
+}
+
+function deleteRow(index) {
+    if (confirm("Удалить эту строку?")) {
+        savedRows.splice(index, 1);
+        localStorage.setItem('rows', JSON.stringify(savedRows));
+        rebuildTableFromStorage();
+    }
+}
+
+function editRow(index) {
+    const row = savedRows[index];
+    const ids = ['title', 'type', 'emotion', 'theme', 'ctr', 'reach', 'comment'];
+    ids.forEach((id, i) => document.getElementById(id).value = row[i]);
+    deleteRow(index);
+}
+
+</script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js">
+function rebuildTableFromStorage() {
+    table.clear();
+    const saved = JSON.parse(localStorage.getItem('rows') || '[]');
+    saved.forEach((row, index) => {
+        table.row.add([
+            row[0] + '<span class="copy-btn" onclick="copyText(\'' + row[0].replace(/'/g, "\\'") + '\')">📋</span>',
+            row[1], row[2], row[3], row[4], row[5], row[6],
+            `<span onclick="editRow(${index})" style='cursor:pointer; color:#4f46e5;'>✏️</span>
+             <span onclick="deleteRow(${index})" style='cursor:pointer; margin-left:10px; color:#ef4444;'>🗑️</span>`
+        ]).draw();
+    });
+    updateFilters();
+}
+
+function deleteRow(index) {
+    if (confirm("Удалить эту строку?")) {
+        savedRows.splice(index, 1);
+        localStorage.setItem('rows', JSON.stringify(savedRows));
+        rebuildTableFromStorage();
+    }
+}
+
+function editRow(index) {
+    const row = savedRows[index];
+    const ids = ['title', 'type', 'emotion', 'theme', 'ctr', 'reach', 'comment'];
+    ids.forEach((id, i) => document.getElementById(id).value = row[i]);
+    deleteRow(index);
+}
+
+</script>
+    <script>
+        let table;
+        const savedRows = JSON.parse(localStorage.getItem('rows') || '[]');
+
+        document.addEventListener("DOMContentLoaded", () => {
+            table = $('#headlineTable').DataTable({
+                language: {
+                    url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/ru.json"
+                }
+            });
+            savedRows.forEach((row, index) => {
+                table.row.add([
+        row[0] + '<span class="copy-btn" onclick="copyText(\'' + row[0].replace(/'/g, "\\'") + '\')">📋</span>',
+        row[1], row[2], row[3], row[4], row[5], row[6],
+        `<span onclick="editRow(${index})" style='cursor:pointer; color:#4f46e5;'>✏️</span>
+         <span onclick="deleteRow(${index})" style='cursor:pointer; margin-left:10px; color:#ef4444;'>🗑️</span>`
+    ])
+                    row[0] + '<span class="copy-btn" onclick="copyText(\'' + row[0].replace(/'/g, "\\'") + '\')">📋</span>',
+                    row[1], row[2], row[3], row[4], row[5], row[6]
+                ]).draw();
+            });
+            updateFilters();
+            document.getElementById('title').focus();
+        });
+
+        function addRow() {
+            const inputs = ['title', 'type', 'emotion', 'theme', 'ctr', 'reach', 'comment'];
+            const row = inputs.map(id => document.getElementById(id).value);
+            if (row.includes('')) return alert("Пожалуйста, заполните все поля.");
+
+            table.row.add([
+        row[0] + '<span class="copy-btn" onclick="copyText(\'' + row[0].replace(/'/g, "\\'") + '\')">📋</span>',
+        row[1], row[2], row[3], row[4], row[5], row[6],
+        `<span onclick="editRow(${index})" style='cursor:pointer; color:#4f46e5;'>✏️</span>
+         <span onclick="deleteRow(${index})" style='cursor:pointer; margin-left:10px; color:#ef4444;'>🗑️</span>`
+    ])
+                row[0] + '<span class="copy-btn" onclick="copyText(\'' + row[0].replace(/'/g, "\\'") + '\')">📋</span>',
+                row[1], row[2], row[3], row[4], row[5], row[6]
+            ]).draw();
+
+            savedRows.push(row);
+            localStorage.setItem('rows', JSON.stringify(savedRows));
+            inputs.forEach(id => document.getElementById(id).value = '');
+            document.getElementById('title').focus();
+            updateFilters();
+        }
+
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => alert('Заголовок скопирован!'));
+        }
+
+        function updateFilters() {
+            const themeSel = document.getElementById('filterTheme');
+            const emoSel = document.getElementById('filterEmotion');
+            const themes = new Set(), emotions = new Set();
+
+            table.rows().every(function() {
+                themes.add(this.data()[3]);
+                emotions.add(this.data()[2]);
+            });
+
+            themeSel.innerHTML = '<option value="">Все темы</option>';
+            emoSel.innerHTML = '<option value="">Все эмоции</option>';
+            themes.forEach(t => themeSel.innerHTML += `<option value="${t}">${t}</option>`);
+            emotions.forEach(e => emoSel.innerHTML += `<option value="${e}">${e}</option>`);
+        }
+
+        document.getElementById('filterTheme').addEventListener('change', e => {
+            table.column(3).search(e.target.value).draw();
+        });
+        document.getElementById('filterEmotion').addEventListener('change', e => {
+            table.column(2).search(e.target.value).draw();
+        });
+
+        function downloadCSV() {
+            const csvRows = [];
+            const headers = ['Заголовок', 'Тип', 'Эмоция', 'Тема', 'CTR', 'Охват', 'Комментарий'];
+            csvRows.push(headers.join(','));
+            table.rows().every(function() {
+                const row = this.data().map(cell => {
+                    const text = cell.replace(/<[^>]+>/g, '').replace(/"/g, '""');
+                    return `"${text}"`;
+                });
+                csvRows.push(row.join(','));
+            });
+            const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'zagolovki.csv';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+    
+function rebuildTableFromStorage() {
+    table.clear();
+    const saved = JSON.parse(localStorage.getItem('rows') || '[]');
+    saved.forEach((row, index) => {
+        table.row.add([
+            row[0] + '<span class="copy-btn" onclick="copyText(\'' + row[0].replace(/'/g, "\\'") + '\')">📋</span>',
+            row[1], row[2], row[3], row[4], row[5], row[6],
+            `<span onclick="editRow(${index})" style='cursor:pointer; color:#4f46e5;'>✏️</span>
+             <span onclick="deleteRow(${index})" style='cursor:pointer; margin-left:10px; color:#ef4444;'>🗑️</span>`
+        ]).draw();
+    });
+    updateFilters();
+}
+
+function deleteRow(index) {
+    if (confirm("Удалить эту строку?")) {
+        savedRows.splice(index, 1);
+        localStorage.setItem('rows', JSON.stringify(savedRows));
+        rebuildTableFromStorage();
+    }
+}
+
+function editRow(index) {
+    const row = savedRows[index];
+    const ids = ['title', 'type', 'emotion', 'theme', 'ctr', 'reach', 'comment'];
+    ids.forEach((id, i) => document.getElementById(id).value = row[i]);
+    deleteRow(index);
+}
+
+</script>
+</body>
+</html>
