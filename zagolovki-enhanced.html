@@ -1,0 +1,540 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Анализ заголовков Дзена</title>
+    <link rel="stylesheet" 
+          href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --gray: #f3f4f6;
+            --border: #e5e7eb;
+            --radius: 10px;
+            --transition: all 0.3s ease;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        input, textarea {
+            transition: var(--transition);
+        }
+        input:focus, textarea:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+        .form-container button {
+            transition: var(--transition);
+        }
+        .form-container button:hover {
+            transform: scale(1.03);
+            box-shadow: 0 4px 14px rgba(79, 70, 229, 0.2);
+        }
+        tr {
+            transition: var(--transition);
+        }
+        tr:hover {
+            background-color: #f9f9ff;
+        }
+        .form-container {
+            animation: fadeIn 0.6s ease;
+        }
+        @keyframes fadeIn {
+            from {opacity: 0; transform: translateY(20px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --gray: #f3f4f6;
+            --border: #e5e7eb;
+            --radius: 10px;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9f9f9;
+            padding: 40px;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+        }
+        .form-container {
+            background: white; border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .form-container input, .form-container textarea {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        .form-container button {
+            background: var(--primary);
+            color: white;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .form-container button:hover {
+            background: var(--primary-dark);
+        }
+        table {
+            background-color: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+    </style>
+
+    <style>
+        body.dark {
+            background-color: #111827;
+            color: #f3f4f6;
+        }
+        body.dark .form-container {
+            background-color: #1f2937;
+            border-color: #374151;
+        }
+        body.dark input, body.dark textarea {
+            background-color: #374151;
+            color: #f3f4f6;
+            border-color: #4b5563;
+        }
+        body.dark input:focus, body.dark textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.4);
+        }
+        body.dark table {
+            background-color: #1f2937;
+        }
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .theme-toggle:hover {
+            background: var(--primary-dark);
+        }
+    </style>
+
+    <style>
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px auto;
+            max-width: 900px;
+            justify-content: center;
+        }
+        .controls select, .controls button {
+            padding: 8px 14px;
+            font-size: 14px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            background: white;
+            cursor: pointer;
+        }
+        .controls select:focus {
+            outline: 2px solid var(--primary);
+        }
+        .copy-btn {
+            cursor: pointer;
+            color: var(--primary-dark);
+            font-size: 14px;
+            margin-left: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Анализ заголовков для Дзена</h1>
+
+    <div class="form-container">
+        <h2>➕ Добавить новый заголовок</h2>
+        <input type="text" id="title" placeholder="Заголовок">
+        <input type="text" id="type" placeholder="Тип (например: Цитата, конфликт)">
+        <input type="text" id="emotion" placeholder="Эмоция (например: Гнев, обида)">
+        <input type="text" id="theme" placeholder="Тема (например: Семья)">
+        <input type="text" id="ctr" placeholder="CTR (например: 12%)">
+        <input type="text" id="reach" placeholder="Охват (например: 20 000)">
+        <textarea id="comment" placeholder="Комментарий"></textarea>
+        <button onclick="addRow()">Добавить</button>
+    </div>
+
+    <div class="controls">
+        <select id="filterTheme">
+            <option value="">Все темы</option>
+        </select>
+        <select id="filterEmotion">
+            <option value="">Все эмоции</option>
+        </select>
+        <button onclick="downloadCSV()">⬇️ Скачать CSV</button>
+    </div>
+    <table id="headlineTable" class="display">
+        <thead>
+            <tr>
+                <th>Заголовок</th>
+                <th>Тип</th>
+                <th>Эмоция</th>
+                <th>Тема</th>
+                <th>CTR</th>
+                <th>Охват</th>
+                <th>Комментарий</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>«Ты ей квартиру, а она тебе рога!» — сказала свекровь. А я молча подала на развод.</td>
+                <td>Цитата, конфликт</td>
+                <td>Гнев, обида</td>
+                <td>Семья</td>
+                <td>14%</td>
+                <td>25 000</td>
+                <td>Сильный эмоциональный крючок</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js">
+        function downloadCSV() {
+            const csvRows = [];
+            const headers = ['Заголовок', 'Тип', 'Эмоция', 'Тема', 'CTR', 'Охват', 'Комментарий'];
+            csvRows.push(headers.join(','));
+
+            headlineTable.rows().every(function() {
+                const row = this.data().map(cell => {
+                    const text = cell.replace(/<[^>]+>/g, '').replace(/"/g, '""');
+                    return `"${text}"`;
+                });
+                csvRows.push(row.join(','));
+            });
+
+            const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'zagolovki.csv';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Заголовок скопирован!');
+            });
+        }
+
+        function updateFilters() {
+            const themes = new Set();
+            const emotions = new Set();
+            headlineTable.rows().every(function() {
+                themes.add(this.data()[3]);
+                emotions.add(this.data()[2]);
+            });
+
+            const themeSelect = document.getElementById('filterTheme');
+            const emotionSelect = document.getElementById('filterEmotion');
+
+            themeSelect.innerHTML = '<option value="">Все темы</option>';
+            emotionSelect.innerHTML = '<option value="">Все эмоции</option>';
+
+            themes.forEach(t => themeSelect.innerHTML += `<option value="${t}">${t}</option>`);
+            emotions.forEach(e => emotionSelect.innerHTML += `<option value="${e}">${e}</option>`);
+        }
+
+        document.getElementById('filterTheme').addEventListener('change', function() {
+            headlineTable.column(3).search(this.value).draw();
+        });
+        document.getElementById('filterEmotion').addEventListener('change', function() {
+            headlineTable.column(2).search(this.value).draw();
+        });
+
+        setTimeout(updateFilters, 1000);
+    </script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js">
+        function downloadCSV() {
+            const csvRows = [];
+            const headers = ['Заголовок', 'Тип', 'Эмоция', 'Тема', 'CTR', 'Охват', 'Комментарий'];
+            csvRows.push(headers.join(','));
+
+            headlineTable.rows().every(function() {
+                const row = this.data().map(cell => {
+                    const text = cell.replace(/<[^>]+>/g, '').replace(/"/g, '""');
+                    return `"${text}"`;
+                });
+                csvRows.push(row.join(','));
+            });
+
+            const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'zagolovki.csv';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Заголовок скопирован!');
+            });
+        }
+
+        function updateFilters() {
+            const themes = new Set();
+            const emotions = new Set();
+            headlineTable.rows().every(function() {
+                themes.add(this.data()[3]);
+                emotions.add(this.data()[2]);
+            });
+
+            const themeSelect = document.getElementById('filterTheme');
+            const emotionSelect = document.getElementById('filterEmotion');
+
+            themeSelect.innerHTML = '<option value="">Все темы</option>';
+            emotionSelect.innerHTML = '<option value="">Все эмоции</option>';
+
+            themes.forEach(t => themeSelect.innerHTML += `<option value="${t}">${t}</option>`);
+            emotions.forEach(e => emotionSelect.innerHTML += `<option value="${e}">${e}</option>`);
+        }
+
+        document.getElementById('filterTheme').addEventListener('change', function() {
+            headlineTable.column(3).search(this.value).draw();
+        });
+        document.getElementById('filterEmotion').addEventListener('change', function() {
+            headlineTable.column(2).search(this.value).draw();
+        });
+
+        setTimeout(updateFilters, 1000);
+    </script>
+    <script>
+        let table;
+    document.addEventListener("DOMContentLoaded", () => {
+        if (!$.fn.DataTable.isDataTable('#headlineTable')) {
+            table = $('#headlineTable').DataTable({
+                language: {
+                    url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/ru.json"
+                }
+            });
+
+            // Восстановление сохранённых строк
+            savedRows.forEach(row => table.row.add(row).draw());
+        } else {
+            table = $('#headlineTable').DataTable();
+        }
+
+        document.getElementById('title').focus();
+        window.headlineTable = table;
+    });
+            $('#headlineTable').DataTable({
+                language: {
+                    url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/ru.json"
+                }
+            });
+        });
+
+        function addRow() {
+            const table = window.headlineTable;
+            const title = $('#title').val();
+            const type = $('#type').val();
+            const emotion = $('#emotion').val();
+            const theme = $('#theme').val();
+            const ctr = $('#ctr').val();
+            const reach = $('#reach').val();
+            const comment = $('#comment').val();
+
+            if (!title || !type || !emotion || !theme || !ctr || !reach || !comment) {
+                alert("Пожалуйста, заполните все поля.");
+                return;
+            }
+
+            table.row.add([
+                title, type, emotion, theme, ctr, reach, comment
+            ]).draw();
+
+            // Очистка полей
+            $('#title').val('');
+            $('#type').val('');
+            $('#emotion').val('');
+            $('#theme').val('');
+            $('#ctr').val('');
+            $('#reach').val('');
+            $('#comment').val('');
+        }
+    
+        function downloadCSV() {
+            const csvRows = [];
+            const headers = ['Заголовок', 'Тип', 'Эмоция', 'Тема', 'CTR', 'Охват', 'Комментарий'];
+            csvRows.push(headers.join(','));
+
+            headlineTable.rows().every(function() {
+                const row = this.data().map(cell => {
+                    const text = cell.replace(/<[^>]+>/g, '').replace(/"/g, '""');
+                    return `"${text}"`;
+                });
+                csvRows.push(row.join(','));
+            });
+
+            const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'zagolovki.csv';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Заголовок скопирован!');
+            });
+        }
+
+        function updateFilters() {
+            const themes = new Set();
+            const emotions = new Set();
+            headlineTable.rows().every(function() {
+                themes.add(this.data()[3]);
+                emotions.add(this.data()[2]);
+            });
+
+            const themeSelect = document.getElementById('filterTheme');
+            const emotionSelect = document.getElementById('filterEmotion');
+
+            themeSelect.innerHTML = '<option value="">Все темы</option>';
+            emotionSelect.innerHTML = '<option value="">Все эмоции</option>';
+
+            themes.forEach(t => themeSelect.innerHTML += `<option value="${t}">${t}</option>`);
+            emotions.forEach(e => emotionSelect.innerHTML += `<option value="${e}">${e}</option>`);
+        }
+
+        document.getElementById('filterTheme').addEventListener('change', function() {
+            headlineTable.column(3).search(this.value).draw();
+        });
+        document.getElementById('filterEmotion').addEventListener('change', function() {
+            headlineTable.column(2).search(this.value).draw();
+        });
+
+        setTimeout(updateFilters, 1000);
+    </script>
+
+    <button class="theme-toggle" onclick="toggleTheme()">🌓 Тема</button>
+    <script>
+        const body = document.body;
+        const inputs = ['title', 'type', 'emotion', 'theme', 'ctr', 'reach', 'comment'];
+        const savedRows = JSON.parse(localStorage.getItem('rows') || '[]');
+
+        function toggleTheme() {
+            body.classList.toggle('dark');
+            localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
+        }
+
+        function addRow() {
+            const table = window.headlineTable;
+            const row = inputs.map(id => document.getElementById(id).value);
+            if (row.includes('')) {
+                alert("Пожалуйста, заполните все поля.");
+                return;
+            }
+
+            table.row.add([
+        row[0] + '<span class="copy-btn" onclick="copyText(\'' + row[0].replace(/'/g, "\\'") + '\')">📋</span>',
+        row[1], row[2], row[3], row[4], row[5], row[6]
+    ]).draw();
+            savedRows.push(row);
+            localStorage.setItem('rows', JSON.stringify(savedRows));
+
+            inputs.forEach(id => document.getElementById(id).value = '');
+            document.getElementById('title').focus();
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            if (localStorage.getItem('theme') === 'dark') {
+                body.classList.add('dark');
+            }
+            document.getElementById('title').focus();
+
+            const table = window.headlineTable;
+            savedRows.forEach(row => table.row.add(row).draw());
+        });
+    
+        function downloadCSV() {
+            const csvRows = [];
+            const headers = ['Заголовок', 'Тип', 'Эмоция', 'Тема', 'CTR', 'Охват', 'Комментарий'];
+            csvRows.push(headers.join(','));
+
+            headlineTable.rows().every(function() {
+                const row = this.data().map(cell => {
+                    const text = cell.replace(/<[^>]+>/g, '').replace(/"/g, '""');
+                    return `"${text}"`;
+                });
+                csvRows.push(row.join(','));
+            });
+
+            const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'zagolovki.csv';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Заголовок скопирован!');
+            });
+        }
+
+        function updateFilters() {
+            const themes = new Set();
+            const emotions = new Set();
+            headlineTable.rows().every(function() {
+                themes.add(this.data()[3]);
+                emotions.add(this.data()[2]);
+            });
+
+            const themeSelect = document.getElementById('filterTheme');
+            const emotionSelect = document.getElementById('filterEmotion');
+
+            themeSelect.innerHTML = '<option value="">Все темы</option>';
+            emotionSelect.innerHTML = '<option value="">Все эмоции</option>';
+
+            themes.forEach(t => themeSelect.innerHTML += `<option value="${t}">${t}</option>`);
+            emotions.forEach(e => emotionSelect.innerHTML += `<option value="${e}">${e}</option>`);
+        }
+
+        document.getElementById('filterTheme').addEventListener('change', function() {
+            headlineTable.column(3).search(this.value).draw();
+        });
+        document.getElementById('filterEmotion').addEventListener('change', function() {
+            headlineTable.column(2).search(this.value).draw();
+        });
+
+        setTimeout(updateFilters, 1000);
+    </script>
+</body>
+</html>
