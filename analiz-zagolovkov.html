@@ -1,0 +1,95 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Анализ заголовков</title>
+    <link rel="stylesheet" 
+          href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+    </style>
+</head>
+<body>
+    <h1>Анализ заголовков для Дзена</h1>
+    <table id="headlineTable" class="display">
+        <thead>
+            <tr>
+                <th>Заголовок</th>
+                <th>Тип</th>
+                <th>Эмоция</th>
+                <th>Тема</th>
+                <th>CTR</th>
+                <th>Охват</th>
+                <th>Комментарий</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>«Ты ей квартиру, а она тебе рога!» — сказала свекровь. А я молча подала на развод.</td>
+                <td>Цитата, конфликт</td>
+                <td>Гнев, обида</td>
+                <td>Семья</td>
+                <td>14%</td>
+                <td>25 000</td>
+                <td>Сильный эмоциональный крючок</td>
+            </tr>
+            <tr>
+                <td>Брат потребовал продать дом, в котором я сделала ремонт.</td>
+                <td>Конфликт</td>
+                <td>Раздражение</td>
+                <td>Наследство</td>
+                <td>11%</td>
+                <td>19 000</td>
+                <td>Понятный конфликт, жизненная ситуация</td>
+            </tr>
+            <tr>
+                <td>Что произошло, когда я отказалась взять сестру жить с нами?</td>
+                <td>Интрига</td>
+                <td>Любопытство</td>
+                <td>Семья</td>
+                <td>13%</td>
+                <td>22 000</td>
+                <td>Вызывает интерес к развязке</td>
+            </tr>
+            <tr>
+                <td>Я ждала помощи, а получила претензии: как семья обернулась спиной</td>
+                <td>Предательство</td>
+                <td>Огорчение</td>
+                <td>Поддержка</td>
+                <td>10%</td>
+                <td>18 000</td>
+                <td>Отражает типичную бытовую боль</td>
+            </tr>
+            <tr>
+                <td>Телефон разряжался за 3 часа — помогла одна настройка, о которой никто не говорит</td>
+                <td>Лайфхак</td>
+                <td>Удивление</td>
+                <td>Техника</td>
+                <td>8%</td>
+                <td>15 000</td>
+                <td>Простой совет, высокая применимость</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#headlineTable').DataTable({
+                language: {
+                    url: "//cdn.datatables.net/plug-ins/1.13.4/i18n/ru.json"
+                }
+            });
+        });
+    </script>
+</body>
+</html>
