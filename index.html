@@ -6,58 +6,76 @@
   <title>Инструменты анализа заголовков</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f2f2f2;
       margin: 0;
       padding: 0;
     }
+
     header {
-      background-color: #333;
-      color: #fff;
-      padding: 1em 2em;
+      background-color: #24292e;
+      color: white;
+      padding: 20px;
       text-align: center;
     }
+
     main {
       max-width: 800px;
-      margin: 2em auto;
-      padding: 1em;
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin: 40px auto;
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
     }
+
     h1 {
       margin-top: 0;
+      font-size: 28px;
     }
+
     p.description {
-      font-size: 1.1em;
-      color: #555;
+      font-size: 16px;
+      color: #444;
+      margin-bottom: 30px;
     }
+
     nav {
-      margin-top: 2em;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
+
     a.tool-link {
-      display: block;
-      background-color: #e0e0e0;
-      color: #333;
       text-decoration: none;
-      padding: 1em;
-      margin: 0.5em 0;
+      background-color: #eaeaea;
+      color: #333;
+      padding: 14px;
       border-radius: 8px;
-      transition: background-color 0.3s ease;
+      font-size: 16px;
+      transition: background-color 0.3s ease, transform 0.2s ease;
     }
+
     a.tool-link:hover {
-      background-color: #c0c0c0;
+      background-color: #d6d6d6;
+      transform: translateX(5px);
+    }
+
+    footer {
+      text-align: center;
+      font-size: 12px;
+      color: #888;
+      margin-top: 40px;
     }
   </style>
 </head>
 <body>
   <header>
-    <h1>Инструменты анализа заголовков</h1>
+    <h1>🛠 Инструменты анализа заголовков</h1>
   </header>
   <main>
-    <p class="description">Добро пожаловать! Здесь вы можете выбрать нужный инструмент для работы с заголовками:</p>
+    <p class="description">Добро пожаловать! Выберите один из инструментов ниже для работы с заголовками Дзена:</p>
     <nav>
-      <a class="tool-link" href="analiz-zagolovkov-form.html">📋 Простая форма анализа</a>
+      <a class="tool-link" href="analiz-zagolovkov-form.html">📋 Анализатор заголовков (форма)</a>
       <a class="tool-link" href="zagolovki-ctr-filter.html">🎯 Фильтр по CTR</a>
       <a class="tool-link" href="zagolovki-autoanalysis.html">🤖 Умный анализатор (autoanalysis)</a>
       <a class="tool-link" href="zagolovki-editable.html">✏️ Редактор таблицы</a>
@@ -65,5 +83,8 @@
       <a class="tool-link" href="zagolovki-final.html">🔍 Финальный анализатор</a>
     </nav>
   </main>
+  <footer>
+    © 2025 Проект анализа заголовков. GitHub Pages.
+  </footer>
 </body>
 </html>
