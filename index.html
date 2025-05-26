@@ -1,0 +1,86 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Анализ заголовков Дзена</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background-color: #f8f8f8;
+    }
+    h1 {
+      text-align: center;
+    }
+    textarea {
+      width: 100%;
+      height: 150px;
+      margin-bottom: 10px;
+      padding: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .result {
+      margin-top: 20px;
+      background: white;
+      padding: 10px;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Анализ заголовков Дзена</h1>
+  <p>Вставьте заголовки по одному на строку:</p>
+  <textarea id="input" placeholder="Пример:
+Телефон разряжался за 3 часа — помогла одна настройка..."></textarea>
+  <br />
+  <button onclick="analyze()">Анализировать</button>
+  <div class="result" id="output"></div>
+
+  <script>
+    function analyze() {
+      const input = document.getElementById("input").value.trim();
+      const lines = input.split("\n").filter(l => l.trim() !== "");
+      const output = document.getElementById("output");
+      if (lines.length === 0) {
+        output.innerHTML = "<i>Введите хотя бы один заголовок.</i>";
+        return;
+      }
+      const results = lines.map((line, i) => {
+        let emotion = "";
+        let type = "";
+        let comment = "";
+
+        if (line.includes("помогла") || line.includes("настройка") || line.includes("лайфхак")) {
+          type = "Лайфхак";
+          emotion = "Удивление";
+          comment = "Полезный совет, высокая применимость";
+        } else if (line.includes("потребовал") || line.includes("оскорбил") || line.includes("обвинил")) {
+          type = "Конфликт";
+          emotion = "Раздражение";
+          comment = "Понятный конфликт, жизненная ситуация";
+        } else if (line.includes("предал") || line.includes("обернулась спиной")) {
+          type = "Предательство";
+          emotion = "Огорчение";
+          comment = "Отражает типичную бытовую боль";
+        } else {
+          type = "Без категории";
+          emotion = "Нейтрально";
+          comment = "Требуется ручной анализ";
+        }
+
+        return `<b>${i+1}. ${line}</b><br>Тип: ${type}<br>Эмоция: ${emotion}<br>Комментарий: ${comment}<br><br>`;
+      });
+
+      output.innerHTML = results.join("");
+    }
+  </script>
+</body>
+</html>
