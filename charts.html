@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>График длины заголовков</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    textarea {
+      width: 100%;
+      height: 120px;
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 14px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      resize: vertical;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    canvas {
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <h1>📏 Длина заголовков</h1>
+  <p>Вставьте заголовки по одному на строку:</p>
+  <textarea id="inputArea" placeholder="Пример:
+Смартфон за 3 часа — помогла одна настройка..."></textarea>
+  <br />
+  <button onclick="generateChart()">Показать график</button>
+
+  <canvas id="headlineChart"></canvas>
+
+  <script>
+    let chart;
+
+    function generateChart() {
+      const input = document.getElementById('inputArea').value.trim();
+      const lines = input.split('\\n').filter(line => line.trim().length > 0);
+
+      const labels = lines.map((_, i) => `Заголовок ${i + 1}`);
+      const data = lines.map(line => line.length);
+
+      const ctx = document.getElementById('headlineChart').getContext('2d');
+
+      if (chart) chart.destroy(); // удалить старый график
+
+      chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Длина заголовка (в символах)',
+            data: data,
+            backgroundColor: '#4CAF50'
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: 'Символов'
+              }
+            }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>
