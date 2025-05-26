@@ -1,1 +1,195 @@
-<содержимое HTML с автоанализом и импортом CSV (то же, что выше)>
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Анализ заголовков Дзена — автоанализ</title>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+  <style>
+    body { font-family: sans-serif; background: #f9fafb; padding: 20px; }
+    h1 { text-align: center; }
+    .container { max-width: 1000px; margin: auto; background: #fff; padding: 20px; border-radius: 8px; }
+    input, textarea, select { width: 100%; padding: 8px; margin: 6px 0; }
+    table.dataTable { margin-top: 20px; width: 100% !important; }
+    .inline { display: flex; gap: 10px; }
+    .inline input { flex: 1; }
+    .actions span { cursor: pointer; margin-right: 10px; }
+    .green { color: green; font-weight: bold; }
+    .yellow { color: orange; font-weight: bold; }
+    .red { color: red; font-weight: bold; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Автоанализ заголовков Дзена</h1>
+
+  <div>
+    <label>Заголовок</label>
+    <input id="title" placeholder="Введите заголовок">
+    <div class="inline">
+      <div><label>Тема</label><input id="theme"></div>
+      <div><label>Тип</label><input id="type"></div>
+      <div><label>Эмоция</label><input id="emotion"></div>
+    </div>
+    <div class="inline">
+      <div><label>CTR (%)</label><input id="ctr" placeholder="например, 12.5"></div>
+      <div><label>Охват</label><input id="reach"></div>
+    </div>
+    <label>Комментарий</label>
+    <textarea id="comment" rows="2"></textarea>
+    <button onclick="addRow()">Добавить</button>
+    <button onclick="downloadCSV()">Скачать CSV</button>
+    <input type="file" id="fileInput" accept=".csv">
+    <button onclick="document.getElementById('fileInput').click()">Импорт CSV</button>
+  </div>
+
+  <table id="headlineTable" class="display">
+    <thead>
+      <tr>
+        <th>Заголовок</th><th>Тип</th><th>Эмоция</th><th>Тема</th><th>CTR</th><th>Охват</th><th>Комментарий</th><th>Действия</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script>
+let table;
+let savedRows = JSON.parse(localStorage.getItem('rows') || '[]');
+
+document.addEventListener("DOMContentLoaded", () => {
+  table = $('#headlineTable').DataTable();
+  rebuildTable();
+});
+
+function analyzeTitle(title) {
+  const lower = title.toLowerCase();
+  let theme = '', type = '', emotion = '';
+
+  if (lower.includes('муж') || lower.includes('жена') || lower.includes('семья')) theme = 'Семья';
+  else if (lower.includes('деньги') || lower.includes('работа')) theme = 'Финансы';
+  else if (lower.includes('боль') || lower.includes('здоров')) theme = 'Здоровье';
+  else if (lower.includes('ребёнок') || lower.includes('дочь') || lower.includes('сын')) theme = 'Дети';
+  else theme = 'Общее';
+
+  if (lower.includes('?')) type = 'Вопрос';
+  else if (lower.includes('как')) type = 'Совет';
+  else if (lower.includes('сказал') || lower.includes('ответила')) type = 'Цитата';
+  else type = 'Обычный';
+
+  if (lower.includes('не') || lower.includes('ушёл') || lower.includes('потеряла')) emotion = 'Обида';
+  else if (lower.includes('удив') || lower.includes('впервые')) emotion = 'Удивление';
+  else if (lower.includes('радость') || lower.includes('вдохнов')) emotion = 'Радость';
+  else emotion = 'Нейтрально';
+
+  return { theme, type, emotion };
+}
+
+function addRow() {
+  const title = document.getElementById('title').value.trim();
+  const ctr = document.getElementById('ctr').value.trim();
+  const reach = document.getElementById('reach').value.trim();
+  const comment = document.getElementById('comment').value.trim();
+  let theme = document.getElementById('theme').value.trim();
+  let type = document.getElementById('type').value.trim();
+  let emotion = document.getElementById('emotion').value.trim();
+
+  if (!theme || !type || !emotion) {
+    const analysis = analyzeTitle(title);
+    theme = theme || analysis.theme;
+    type = type || analysis.type;
+    emotion = emotion || analysis.emotion;
+  }
+
+  const row = [title, type, emotion, theme, ctr, reach, comment];
+  savedRows.push(row);
+  localStorage.setItem('rows', JSON.stringify(savedRows));
+  rebuildTable();
+}
+
+function rebuildTable() {
+  table.clear();
+  savedRows.forEach((row, i) => {
+    const ctrNum = parseFloat(row[4]);
+    let ctrClass = ctrNum >= 10 ? 'green' : (ctrNum >= 5 ? 'yellow' : 'red');
+    table.row.add([
+      row[0],
+      row[1],
+      row[2],
+      row[3],
+      `<span class="${ctrClass}">${row[4]}%</span>`,
+      row[5],
+      row[6],
+      `<span onclick="editRow(${i})">✏️</span><span onclick="deleteRow(${i})">🗑️</span>`
+    ]);
+  });
+  table.draw();
+}
+
+function editRow(i) {
+  const row = savedRows[i];
+  document.getElementById('title').value = row[0];
+  document.getElementById('type').value = row[1];
+  document.getElementById('emotion').value = row[2];
+  document.getElementById('theme').value = row[3];
+  document.getElementById('ctr').value = row[4];
+  document.getElementById('reach').value = row[5];
+  document.getElementById('comment').value = row[6];
+  savedRows.splice(i, 1);
+  localStorage.setItem('rows', JSON.stringify(savedRows));
+  rebuildTable();
+}
+
+function deleteRow(i) {
+  if (confirm("Удалить запись?")) {
+    savedRows.splice(i, 1);
+    localStorage.setItem('rows', JSON.stringify(savedRows));
+    rebuildTable();
+  }
+}
+
+function downloadCSV() {
+  const headers = ['Заголовок','Тип','Эмоция','Тема','CTR','Охват','Комментарий'];
+  let csv = headers.join(',') + '\n';
+  savedRows.forEach(r => {
+    csv += r.map(x => `"${(x||'').replace(/"/g, '""')}"`).join(',') + '\n';
+  });
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'zagolovki.csv';
+  a.click();
+}
+
+// Импорт CSV
+document.getElementById('fileInput').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const lines = e.target.result.split('\n').filter(Boolean);
+    lines.shift(); // remove header
+    for (let line of lines) {
+      const parts = line.split(',');
+      const title = parts[0]?.replace(/^"|"$/g, '').trim();
+      const analysis = analyzeTitle(title);
+      savedRows.push([
+        title,
+        parts[1]?.replace(/^"|"$/g, '').trim() || analysis.type,
+        parts[2]?.replace(/^"|"$/g, '').trim() || analysis.emotion,
+        parts[3]?.replace(/^"|"$/g, '').trim() || analysis.theme,
+        parts[4]?.replace(/^"|"$/g, '').trim(),
+        parts[5]?.replace(/^"|"$/g, '').trim(),
+        parts[6]?.replace(/^"|"$/g, '').trim()
+      ]);
+    }
+    localStorage.setItem('rows', JSON.stringify(savedRows));
+    rebuildTable();
+  };
+  reader.readAsText(file);
+});
+</script>
+</body>
+</html>
